@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Code Chronicles – Das Abenteuer beginnt</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    :root {
+      --bg: #0d1117;
+      --bg2: #161b22;
+      --bg3: #1f2430;
+      --border: #30363d;
+      --border2: #454f5d;
+      --gold: #d4a017;
+      --gold2: #f0c040;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --ok: #3fb950;
+      --err: #f85149;
+      --c1: #d4a017;
+      --c2: #e06b56;
+      --c3: #39c5a6;
+      --c4: #a371f7;
+      --code-bg: #090d12;
+      --code: #a8d8a0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Crimson Pro', Georgia, serif;
+      font-size: 18px;
+      line-height: 1.7;
+      min-height: 100vh
+    }
+
+    #app {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 1.5rem
+    }
+
+    /* ── Header ── */
+    .hdr {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      padding: .65rem 1rem;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 1.25rem
+    }
+
+    .hdr-title {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 13px;
+      color: var(--gold);
+      flex-shrink: 0
+    }
+
+    .xp-lbl {
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+      font-family: 'JetBrains Mono', monospace
+    }
+
+    .xp-wrap {
+      flex: 1;
+      height: 7px;
+      background: var(--bg3);
+      border-radius: 4px;
+      overflow: hidden;
+      min-width: 60px
+    }
+
+    .xp-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold), var(--gold2));
+      border-radius: 4px;
+      transition: width .6s ease
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem
+    }
+
+    .card-accent {
+      border-left: 4px solid var(--ch, var(--gold))
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      padding: .7rem 1.6rem;
+      border-radius: 8px;
+      border: 1.5px solid;
+      cursor: pointer;
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 13px;
+      background: transparent;
+      transition: all .15s ease;
+      color: var(--gold);
+      border-color: var(--gold)
+    }
+
+    .btn:hover {
+      background: rgba(212, 160, 23, .1);
+      transform: translateY(-1px)
+    }
+
+    .btn:active {
+      transform: translateY(0)
+    }
+
+    .btn-sm {
+      padding: .5rem 1.1rem;
+      font-size: 11px
+    }
+
+    .btn-ghost {
+      color: var(--muted);
+      border-color: var(--border)
+    }
+
+    .btn-ghost:hover {
+      background: var(--bg3);
+      color: var(--text)
+    }
+
+    .btn-ok {
+      color: var(--ok);
+      border-color: var(--ok)
+    }
+
+    .btn-ok:hover {
+      background: rgba(63, 185, 80, .1)
+    }
+
+    /* ── Title Screen ── */
+    .title-screen {
+      text-align: center;
+      padding: 2.5rem 1rem
+    }
+
+    .game-title {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: clamp(22px, 5vw, 40px);
+      color: var(--gold2);
+      line-height: 1.3;
+      margin-bottom: .4rem
+    }
+
+    .game-sub {
+      font-size: 19px;
+      color: var(--muted);
+      font-style: italic;
+      margin-bottom: 2rem
+    }
+
+    .badges {
+      display: flex;
+      justify-content: center;
+      gap: .6rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.75rem
+    }
+
+    .badge {
+      padding: .3rem .8rem;
+      border-radius: 99px;
+      font-size: 13px;
+      font-family: 'JetBrains Mono', monospace;
+      border: 1px solid
+    }
+
+    /* ── Chapter Map ── */
+    .ch-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .9rem
+    }
+
+    @media(max-width:480px) {
+      .ch-grid {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .ch-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.2rem;
+      cursor: pointer;
+      transition: all .2s ease;
+      position: relative;
+      overflow: hidden
+    }
+
+    .ch-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: var(--ch, var(--gold))
+    }
+
+    .ch-card:hover:not(.locked) {
+      border-color: var(--ch, var(--gold));
+      transform: translateY(-2px)
+    }
+
+    .ch-card.locked {
+      opacity: .4;
+      cursor: not-allowed
+    }
+
+    .ch-card.done {
+      border-color: var(--ok)
+    }
+
+    .ch-card.done::before {
+      background: var(--ok)
+    }
+
+    .ch-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      margin-bottom: .2rem;
+      letter-spacing: 1px
+    }
+
+    .ch-name {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 12px;
+      line-height: 1.5;
+      margin-bottom: .3rem
+    }
+
+    .ch-concept {
+      font-size: 14px;
+      color: var(--muted);
+      font-style: italic
+    }
+
+    .ch-status {
+      font-size: 12px;
+      margin-top: .6rem;
+      font-family: 'JetBrains Mono', monospace
+    }
+
+    /* ── Story ── */
+    .story {
+      font-size: 19px;
+      line-height: 1.75;
+      font-style: italic;
+      white-space: pre-line;
+      margin-bottom: 1.25rem
+    }
+
+    .snippet {
+      font-size: 15px;
+      color: var(--muted);
+      font-style: italic;
+      margin-bottom: .9rem;
+      padding-left: .75rem;
+      border-left: 2px solid var(--border)
+    }
+
+    /* ── Code ── */
+    .code {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.25rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      line-height: 1.9;
+      overflow-x: auto
+    }
+
+    .kw {
+      color: #ff7b72
+    }
+
+    .str {
+      color: #a5d6ff
+    }
+
+    .num {
+      color: #79c0ff
+    }
+
+    .cm {
+      color: #6e7681
+    }
+
+    .fn {
+      color: #d2a8ff
+    }
+
+    .op {
+      color: #ffa657
+    }
+
+    /* ── Question ── */
+    .q-text {
+      font-size: 19px;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      line-height: 1.5
+    }
+
+    .opts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .65rem;
+      margin-bottom: .75rem
+    }
+
+    @media(max-width:480px) {
+      .opts {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .opt {
+      padding: .8rem 1rem;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      text-align: left;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--text);
+      transition: all .15s ease;
+      line-height: 1.5
+    }
+
+    .opt:hover:not(:disabled) {
+      border-color: var(--ch, var(--gold));
+      background: var(--bg2)
+    }
+
+    .opt.correct {
+      border-color: var(--ok);
+      background: rgba(63, 185, 80, .12);
+      color: var(--ok)
+    }
+
+    .opt.wrong {
+      border-color: var(--err);
+      background: rgba(248, 81, 73, .1);
+      color: var(--err)
+    }
+
+    .opt:disabled {
+      cursor: default
+    }
+
+    /* ── Feedback ── */
+    .fb {
+      padding: .9rem 1.1rem;
+      border-radius: 8px;
+      font-size: 16px;
+      line-height: 1.65;
+      margin: .5rem 0 .75rem
+    }
+
+    .fb.ok {
+      background: rgba(63, 185, 80, .08);
+      border: 1px solid var(--ok)
+    }
+
+    .fb.bad {
+      background: rgba(248, 81, 73, .07);
+      border: 1px solid var(--err)
+    }
+
+    .fb-head {
+      font-weight: 600;
+      margin-bottom: .2rem
+    }
+
+    .fb-head.ok {
+      color: var(--ok)
+    }
+
+    .fb-head.bad {
+      color: var(--err)
+    }
+
+    /* ── Progress dots ── */
+    .dots {
+      display: flex;
+      gap: .45rem;
+      margin-bottom: 1.1rem
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--border);
+      transition: background .3s
+    }
+
+    .dot.done {
+      background: var(--ok)
+    }
+
+    .dot.active {
+      background: var(--ch, var(--gold))
+    }
+
+    /* ── Section header ── */
+    .sec-hdr {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 14px;
+      color: var(--gold);
+      margin-bottom: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: .75rem
+    }
+
+    .sec-hdr::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border)
+    }
+
+    /* ── Complete / Victory ── */
+    .cmplt {
+      text-align: center;
+      padding: 1.5rem .5rem
+    }
+
+    .big-ico {
+      font-size: 64px;
+      margin-bottom: .75rem;
+      display: block
+    }
+
+    .xp-earned {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 26px;
+      color: var(--gold2);
+      margin: .75rem 0
+    }
+
+    .star-row {
+      font-size: 28px;
+      letter-spacing: 6px;
+      margin-bottom: .75rem;
+      color: var(--gold)
+    }
+
+    .actions {
+      display: flex;
+      gap: .75rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 1.1rem
+    }
+
+    .actions-left {
+      display: flex;
+      gap: .75rem;
+      flex-wrap: wrap;
+      margin-top: 1.25rem
+    }
+
+    /* ── Summary grid ── */
+    .sum-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .75rem;
+      margin-bottom: 1.1rem
+    }
+
+    @media(max-width:480px) {
+      .sum-grid {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .sum-item {
+      padding: .75rem 1rem;
+      background: var(--bg3);
+      border-radius: 8px;
+      border-left: 3px solid var(--ch, var(--gold))
+    }
+
+    .sum-num {
+      font-size: 10px;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 1px
+    }
+
+    .sum-name {
+      font-size: 13px;
+      margin: .2rem 0
+    }
+
+    .sum-status {
+      font-size: 12px;
+      color: var(--ok)
+    }
+
+    /* ── Progress bar (map) ── */
+    .prog-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      margin-top: .75rem
+    }
+
+    .prog-bar {
+      height: 6px;
+      background: var(--bg3);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: .5rem
+    }
+
+    .prog-fill {
+      height: 100%;
+      background: var(--gold);
+      border-radius: 3px;
+      transition: width .5s
+    }
+
+    /* ── Inline code ── */
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .82em;
+      background: var(--bg3);
+      padding: .1em .4em;
+      border-radius: 4px;
+      color: #a5d6ff
+    }
+
+    /* ── Animations ── */
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    @keyframes pop {
+
+      0%,
+      100% {
+        transform: scale(1)
+      }
+
+      50% {
+        transform: scale(1.04)
+      }
+    }
+
+    @keyframes glow {
+
+      0%,
+      100% {
+        text-shadow: none
+      }
+
+      50% {
+        text-shadow: 0 0 20px rgba(212, 160, 23, .5)
+      }
+    }
+
+    .fade-in {
+      animation: fadeUp .35s ease forwards
+    }
+
+    .pop {
+      animation: pop .35s ease
+    }
+
+    ::-webkit-scrollbar {
+      width: 5px
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg)
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 3px
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app"></div>
+  <script>
+    const CH = {
+      colors: ['#d4a017', '#e06b56', '#39c5a6', '#a371f7'],
+      icons: ['📦', '🐉', '🌀', '📖']
+    };
+
+    const CHAPTERS = [
+      {
+        title: 'Die Hüterin der Truhen',
+        concept: 'Variablen & Datentypen',
+        intro: `Du betrittst das alte Gewölbe tief unter der Akademie. Staub tanzt im Licht der Kristalle. Deine Schritte hallen durch die Stille.
+
+Eine steinerne Hüterin erwacht langsam aus ihrem Schlaf. Ihre Augen leuchten golden.
+
+"Junger Zauberer! Ich bewache die Truhen der Werte seit Jahrhunderten. Bevor ich sie dir öffne, beweise mir, dass du Variablen beherrschst – jene magischen Behälter, die Werte aufbewahren. Jeder Wert hat seinen Typ: Text, Zahl, Kommazahl oder Wahrheit."`,
+        complete: `"Ausgezeichnet, Zauberer!" Die Hüterin verneigt sich tief. "Du erkennst jeden Typ, du verstehst die Kunst der Variablen."
+
+Sie überreicht dir einen goldenen Schlüssel, der im Halbdunkel funkelt. Die Tür zum Drachenpass öffnet sich mit einem tiefen Dröhnen.
+
+Dein nächstes Abenteuer ruft.`,
+        questions: [
+          {
+            story: 'Die Hüterin öffnet vier Truhen. Jede trägt ein Etikett.',
+            code: [
+              { t: 'v', s: 'name' }, { t: 'p', s: ' = ' }, { t: 's', s: '"Zara"' }, { t: 'c', s: '     # Typ: ?' }, { t: 'n' },
+              { t: 'v', s: 'alter' }, { t: 'p', s: ' = ' }, { t: 'n2', s: '18' }, { t: 'c', s: '         # Typ: ?' }, { t: 'n' },
+              { t: 'v', s: 'staerke' }, { t: 'p', s: ' = ' }, { t: 'n2', s: '9.5' }, { t: 'c', s: '       # Typ: ?' }, { t: 'n' },
+              { t: 'v', s: 'ist_held' }, { t: 'p', s: ' = ' }, { t: 'k', s: 'True' }, { t: 'c', s: '    # Typ: ?' },
+            ],
+            question: 'Was ist der Datentyp von  alter = 18  ?',
+            opts: ['str   (Text)', 'int   (Ganzzahl)', 'float  (Kommazahl)', 'bool  (Wahrheitswert)'],
+            right: 1,
+            fb: '✦  18 ist eine Ganzzahl → Typ int.\nText steht in Anführungszeichen (str), Kommazahlen tragen einen Punkt (float), und bool kennt nur True/False.'
+          },
+          {
+            story: '"Die zweite Truhe trägt einen Zähler. Was erscheint, wenn der Zauber wirkt?"',
+            code: [
+              { t: 'v', s: 'level' }, { t: 'p', s: ' = ' }, { t: 'n2', s: '1' }, { t: 'n' },
+              { t: 'v', s: 'level' }, { t: 'p', s: ' = ' }, { t: 'v', s: 'level' }, { t: 'p', s: ' + ' }, { t: 'n2', s: '4' }, { t: 'n' },
+              { t: 'f', s: 'print' }, { t: 'p', s: '(' }, { t: 'v', s: 'level' }, { t: 'p', s: ')' },
+            ],
+            question: 'Was gibt print(level) aus?',
+            opts: ['1', '4', '5', '14'],
+            right: 2,
+            fb: '✦  level startet bei 1. Dann: 1 + 4 = 5. Die 5 wird in level gespeichert. print(level) gibt 5 aus.'
+          },
+          {
+            story: '"Die letzte Truhe öffnet sich nur mit der richtigen Zuweisung."',
+            code: [
+              { t: 'c', s: '# Welche Zeile speichert 99 in der Variable score?' },
+            ],
+            question: 'Welche Zuweisung ist syntaktisch korrekt?',
+            opts: ['99 = score', 'score == 99', 'score = 99', 'int score = 99'],
+            right: 2,
+            fb: '✦  In Python: Variable links, dann =, dann der Wert: score = 99.\n== ist ein Vergleichsoperator ("ist gleich?"), kein Zuweisungsoperator!'
+          }
+        ]
+      },
+      {
+        title: 'Der Drache am Scheideweg',
+        concept: 'If / Else – Entscheidungen',
+        intro: `Am Scheideweg des Drachenpasses versperrt ein mächtiger Drache den Weg – schwarz wie Pech, Augen wie glühende Kohlen.
+
+"Steh, kleiner Zauberer!" donnert seine Stimme durch das Tal. "Ich weiche nur, wenn du die Kunst der Bedingungen beherrschst. Manche Pfade öffnen sich nur, wenn etwas WAHR ist – andere, wenn es FALSCH ist."
+
+"Entscheidungen lenken den Fluss des Codes. Zeig mir, dass du wählen kannst!"`,
+        complete: `"Eindrucksvoll!" Der gewaltige Drache senkt den Kopf – eine Geste des Respekts. "Du triffst Entscheidungen wie ein wahrer Meister des Codes."
+
+Seine Schuppen glänzen kupferfarben im Abendlicht, als er langsam zur Seite tritt. Der Pfad liegt frei.
+
+Das Spiegelgewölbe wartet in der Tiefe.`,
+        questions: [
+          {
+            story: '"Dein Zauber prüft deine Energie. Was ruft er?"',
+            code: [
+              { t: 'v', s: 'energie' }, { t: 'p', s: ' = ' }, { t: 'n2', s: '30' }, { t: 'n' },
+              { t: 'k', s: 'if' }, { t: 'p', s: ' ' }, { t: 'v', s: 'energie' }, { t: 'p', s: ' > ' }, { t: 'n2', s: '50' }, { t: 'p', s: ':' }, { t: 'n' },
+              { t: 'p', s: '    ' }, { t: 'f', s: 'print' }, { t: 'p', s: '(' }, { t: 's', s: '"Stark!"' }, { t: 'p', s: ')' }, { t: 'n' },
+              { t: 'k', s: 'else' }, { t: 'p', s: ':' }, { t: 'n' },
+              { t: 'p', s: '    ' }, { t: 'f', s: 'print' }, { t: 'p', s: '(' }, { t: 's', s: '"Schwach!"' }, { t: 'p', s: ')' },
+            ],
+            question: 'Was gibt der Code aus?',
+            opts: ['Stark!', 'Schwach!', 'Fehler', 'Gar nichts'],
+            right: 1,
+            fb: '✦  energie ist 30. Die Bedingung energie > 50 ist FALSCH (30 ist nicht größer als 50). Daher läuft der else-Zweig: "Schwach!"'
+          },
+          {
+            story: '"Das magische Tor öffnet sich, wenn dein Mana-Wert 100 oder mehr beträgt."',
+            code: [
+              { t: 'v', s: 'mana' }, { t: 'p', s: ' = ' }, { t: 'n2', s: '100' }, { t: 'n' },
+              { t: 'k', s: 'if' }, { t: 'p', s: ' ' }, { t: 'v', s: 'mana' }, { t: 'p', s: ' ' }, { t: 'b', s: '_____' }, { t: 'p', s: ':' }, { t: 'n' },
+              { t: 'p', s: '    ' }, { t: 'f', s: 'print' }, { t: 'p', s: '(' }, { t: 's', s: '"Tor geöffnet!"' }, { t: 'p', s: ')' },
+            ],
+            question: 'Welcher Vergleichsoperator gehört in die Lücke? (mana ≥ 100)',
+            opts: ['> 100', '== 100', '>= 100', '<= 100'],
+            right: 2,
+            fb: '✦  >= bedeutet "größer oder gleich". Sowohl 100 als auch 200 öffnen das Tor. > würde 100 ausschließen. == würde nur exakt 100 akzeptieren.'
+          },
+          {
+            story: '"Letztes Rätsel: Dieser Zauber prüft mehrere Bedingungen. Was erscheint?"',
+            code: [
+              { t: 'v', s: 'x' }, { t: 'p', s: ' = ' }, { t: 'n2', s: '7' }, { t: 'n' },
+              { t: 'k', s: 'if' }, { t: 'p', s: ' ' }, { t: 'v', s: 'x' }, { t: 'p', s: ' % ' }, { t: 'n2', s: '2' }, { t: 'p', s: ' == ' }, { t: 'n2', s: '0' }, { t: 'p', s: ':' }, { t: 'n' },
+              { t: 'p', s: '    ' }, { t: 'f', s: 'print' }, { t: 'p', s: '(' }, { t: 's', s: '"Gerade"' }, { t: 'p', s: ')' }, { t: 'n' },
+              { t: 'k', s: 'elif' }, { t: 'p', s: ' ' }, { t: 'v', s: 'x' }, { t: 'p', s: ' > ' }, { t: 'n2', s: '5' }, { t: 'p', s: ':' }, { t: 'n' },
+              { t: 'p', s: '    ' }, { t: 'f', s: 'print' }, { t: 'p', s: '(' }, { t: 's', s: '"Groß und ungerade"' }, { t: 'p', s: ')' }, { t: 'n' },
+              { t: 'k', s: 'else' }, { t: 'p', s: ':' }, { t: 'n' },
+              { t: 'p', s: '    ' }, { t: 'f', s: 'print' }, { t: 'p', s: '(' }, { t: 's', s: '"Klein und ungerade"' }, { t: 'p', s: ')' },
+            ],
+            question: 'Was wird ausgegeben?',
+            opts: ['Gerade', 'Groß und ungerade', 'Klein und ungerade', 'Fehler'],
+            right: 1,
+            fb: '✦  7 % 2 = 1 (nicht 0) → erste Bedingung FALSCH. Dann: 7 > 5 ist WAHR → "Groß und ungerade". elif wird nur geprüft, wenn if FALSCH war.'
+          }
+        ]
+      },
+      {
+        title: 'Das Spiegelgewölbe',
+        concept: 'Schleifen (Loops)',
+        intro: `Das Spiegelgewölbe – ein Labyrinth aus unzähligen Spiegeln. Jeder Gang gleicht dem vorherigen. Du läufst und läufst, doch kehrst immer zurück.
+
+"Nur wer die Kraft der Wiederholung kennt, findet den Ausgang", flüstert eine Stimme aus allen Richtungen gleichzeitig.
+
+"Schleifen führen denselben Code immer wieder aus – bis eine Bedingung endet. for-Schleifen für eine feste Anzahl. while-Schleifen, solange etwas gilt. Nutze sie weise!"`,
+        complete: `"Du hast das Muster der Wiederholung durchschaut!" Die Stimme jubelt durch die Spiegel.
+
+Die gläsernen Wände bersten in tausend Splitter, die zu Sternen werden. Helles Licht flutet das Gewölbe und zeigt einen goldenen Pfad.
+
+Der Weg zum Turm der Magierin liegt frei vor dir.`,
+        questions: [
+          {
+            story: 'Ein schimmernder Geist erscheint. "Wie oft erschallt der Kampfruf dieser Schleife?"',
+            code: [
+              { t: 'k', s: 'for' }, { t: 'p', s: ' ' }, { t: 'v', s: 'i' }, { t: 'p', s: ' ' }, { t: 'k', s: 'in' }, { t: 'p', s: ' ' }, { t: 'f', s: 'range' }, { t: 'p', s: '(' }, { t: 'n2', s: '3' }, { t: 'p', s: '):' }, { t: 'n' },
+              { t: 'p', s: '    ' }, { t: 'f', s: 'print' }, { t: 'p', s: '(' }, { t: 's', s: '"Schlag!"' }, { t: 'p', s: ')' },
+            ],
+            question: 'Wie oft wird "Schlag!" ausgegeben?',
+            opts: ['1 Mal', '2 Mal', '3 Mal', '4 Mal'],
+            right: 2,
+            fb: '✦  range(3) erzeugt die Zahlen 0, 1, 2 – das sind genau 3 Werte. Die Schleife läuft also 3 Mal und druckt 3× "Schlag!"'
+          },
+          {
+            story: '"Dieser Zauber addiert so lange, bis ein Limit erreicht ist. Was ist das Ergebnis?"',
+            code: [
+              { t: 'v', s: 'schaden' }, { t: 'p', s: ' = ' }, { t: 'n2', s: '0' }, { t: 'n' },
+              { t: 'k', s: 'while' }, { t: 'p', s: ' ' }, { t: 'v', s: 'schaden' }, { t: 'p', s: ' < ' }, { t: 'n2', s: '10' }, { t: 'p', s: ':' }, { t: 'n' },
+              { t: 'p', s: '    ' }, { t: 'v', s: 'schaden' }, { t: 'p', s: ' += ' }, { t: 'n2', s: '3' }, { t: 'n' },
+              { t: 'f', s: 'print' }, { t: 'p', s: '(' }, { t: 'v', s: 'schaden' }, { t: 'p', s: ')' },
+            ],
+            question: 'Was gibt print(schaden) am Ende aus?',
+            opts: ['9', '10', '12', '3'],
+            right: 2,
+            fb: '✦  Schrittweise: 0 → 3 → 6 → 9 → 12. Bei 12 ist "12 < 10" FALSCH → Schleife stoppt. Ausgabe: 12.'
+          },
+          {
+            story: '"Welche Schleife berechnet exakt die Summe 1 + 2 + 3 = 6?"',
+            code: [
+              { t: 'v', s: 'summe' }, { t: 'p', s: ' = ' }, { t: 'n2', s: '0' }, { t: 'n' },
+              { t: 'b', s: '_______________________' }, { t: 'n' },
+              { t: 'p', s: '    ' }, { t: 'v', s: 'summe' }, { t: 'p', s: ' += ' }, { t: 'v', s: 'i' }, { t: 'n' },
+              { t: 'f', s: 'print' }, { t: 'p', s: '(' }, { t: 'v', s: 'summe' }, { t: 'p', s: ')  ' }, { t: 'c', s: '# → 6' },
+            ],
+            question: 'Welche Zeile gehört in die Lücke?',
+            opts: ['for i in range(3):', 'for i in range(1, 4):', 'for i in range(4):', 'for i in range(1, 3):'],
+            right: 1,
+            fb: '✦  range(1, 4) erzeugt 1, 2, 3 → Summe = 6 ✓\nrange(3) gibt 0,1,2 → Summe = 3. range(4) gibt 0–3 → Summe = 6 aber beginnt bei 0. range(1,3) gibt 1,2 → nur 3.'
+          }
+        ]
+      },
+      {
+        title: 'Das Buch der Zauber',
+        concept: 'Funktionen',
+        intro: `In der Spitze des alten Turms liegt das legendäre Buch der Zauber. Die Magierin Seraphine öffnet es mit ruhigen, geübten Händen.
+
+"Willkommen, Zauberer. Du hast weit gereist." Ihre Stimme ist warm und weise. "Funktionen sind das Mächtigste, das du lernen kannst: einmal geschrieben, können sie immer wieder gerufen werden – mit verschiedenen Zutaten, und jedes Mal neu."
+
+"Meistere sie, und du bist ein vollendeter Code-Magier."`,
+        complete: `"Vollkommen!" Seraphine schließt das Buch mit einem sanften Lächeln. Die Seiten leuchten golden.
+
+"Du hast alle vier Säulen der Programmierung gemeistert. Variablen, Entscheidungen, Wiederholungen, Funktionen – du trägst sie alle in dir."
+
+Ein Feuerwerk aus leuchtenden Code-Zeichen explodiert über dem Turm in den Nachthimmel. Die gesamte Akademie jubelt.
+
+Du bist nun ein Meister der Code-Künste. 🏆`,
+        questions: [
+          {
+            story: '"Hier ist ein Zauber. Wie rufst du ihn mit dem Wert 50 auf?"',
+            code: [
+              { t: 'k', s: 'def' }, { t: 'p', s: ' ' }, { t: 'f', s: 'berechne_schaden' }, { t: 'p', s: '(' }, { t: 'v', s: 'angriff' }, { t: 'p', s: '):' }, { t: 'n' },
+              { t: 'p', s: '    ' }, { t: 'k', s: 'return' }, { t: 'p', s: ' ' }, { t: 'v', s: 'angriff' }, { t: 'p', s: ' * ' }, { t: 'n2', s: '2' }, { t: 'n' },
+              { t: 'n' },
+              { t: 'c', s: '# Dein Aufruf mit dem Wert 50:' },
+            ],
+            question: 'Welcher Aufruf übergibt den Wert 50 korrekt?',
+            opts: ['berechne_schaden', 'berechne_schaden()', 'berechne_schaden(50)', 'def berechne_schaden(50)'],
+            right: 2,
+            fb: '✦  Funktionen ruft man mit Namen + runden Klammern auf. Argumente kommen in die Klammern: berechne_schaden(50). Ohne Klammern erhält man nur das Funktionsobjekt, kein Ergebnis.'
+          },
+          {
+            story: '"Dieser Zauber gibt eine Begrüßung zurück. Was erscheint auf dem Bildschirm?"',
+            code: [
+              { t: 'k', s: 'def' }, { t: 'p', s: ' ' }, { t: 'f', s: 'begrüße' }, { t: 'p', s: '(' }, { t: 'v', s: 'name' }, { t: 'p', s: '):' }, { t: 'n' },
+              { t: 'p', s: '    ' }, { t: 'k', s: 'return' }, { t: 'p', s: ' ' }, { t: 's', s: '"Heil, "' }, { t: 'p', s: ' + ' }, { t: 'v', s: 'name' }, { t: 'p', s: ' + ' }, { t: 's', s: '"!"' }, { t: 'n' },
+              { t: 'n' },
+              { t: 'f', s: 'print' }, { t: 'p', s: '(' }, { t: 'f', s: 'begrüße' }, { t: 'p', s: '(' }, { t: 's', s: '"Zara"' }, { t: 'p', s: '))' },
+            ],
+            question: 'Was wird ausgegeben?',
+            opts: ['name', 'begrüße', 'Heil, Zara!', 'Heil, name!'],
+            right: 2,
+            fb: '✦  "Zara" wird als name übergeben. Die Funktion gibt "Heil, " + "Zara" + "!" zurück = "Heil, Zara!". print() zeigt das Ergebnis an.'
+          },
+          {
+            story: '"Der letzte Zauber ist fast fertig. Ein einziges Wort fehlt noch."',
+            code: [
+              { t: 'k', s: 'def' }, { t: 'p', s: ' ' }, { t: 'f', s: 'quadrat' }, { t: 'p', s: '(' }, { t: 'v', s: 'x' }, { t: 'p', s: '):' }, { t: 'n' },
+              { t: 'p', s: '    ' }, { t: 'b', s: '_____' }, { t: 'p', s: '  ' }, { t: 'v', s: 'x' }, { t: 'p', s: ' * ' }, { t: 'v', s: 'x' }, { t: 'n' },
+              { t: 'n' },
+              { t: 'f', s: 'print' }, { t: 'p', s: '(' }, { t: 'f', s: 'quadrat' }, { t: 'p', s: '(' }, { t: 'n2', s: '4' }, { t: 'p', s: '))  ' }, { t: 'c', s: '# → 16' },
+            ],
+            question: 'Welches Schlüsselwort ersetzt  _____  ?',
+            opts: ['print', 'return', 'yield', 'output'],
+            right: 1,
+            fb: '✦  return gibt den Wert aus der Funktion zurück. Ohne return liefert die Funktion None – quadrat(4) wäre dann None, nicht 16.'
+          }
+        ]
+      }
+    ];
+
+    // ── State ────────────────────────────────────────────────────────────────────
+    const S = {
+      screen: 'title', chIdx: 0, qIdx: 0,
+      xp: 0, sel: null, answered: false,
+      done: new Set()
+    };
+    const MAX_XP = CHAPTERS.length * 3 * 15;
+
+    // ── Helpers ──────────────────────────────────────────────────────────────────
+    function el(tag, props = {}, ...kids) {
+      const e = document.createElement(tag);
+      Object.entries(props).forEach(([k, v]) => {
+        if (k === 'cls') e.className = v;
+        else if (k === 'html') e.innerHTML = v;
+        else if (k === 'click') e.onclick = v;
+        else if (k === 'css') e.style.cssText = v;
+        else if (k === 'disabled') e.disabled = v;
+        else e.setAttribute(k, v);
+      });
+      kids.forEach(k => { if (k instanceof Node) e.appendChild(k); });
+      return e;
+    }
+
+    function D(cls, ...kids) {
+      const d = document.createElement('div');
+      if (cls) d.className = cls;
+      kids.forEach(k => {
+        if (typeof k === 'string') { const t = document.createElement('span'); t.innerHTML = k; d.appendChild(t); }
+        else if (k instanceof Node) d.appendChild(k);
+      });
+      return d;
+    }
+
+    function Btn(text, onClick, extra = '') {
+      const b = document.createElement('button');
+      b.className = 'btn' + (extra ? ' ' + extra : '');
+      b.textContent = text;
+      b.onclick = onClick;
+      return b;
+    }
+
+    function go(screen, extra = {}) {
+      Object.assign(S, { screen, sel: null, answered: false }, extra);
+      render();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ── Code renderer ─────────────────────────────────────────────────────────────
+    function mkCode(tokens) {
+      const wrap = document.createElement('div');
+      wrap.className = 'code';
+
+      const typeMap = { k: 'kw', s: 'str', n2: 'num', c: 'cm', f: 'fn', v: '', p: '', b: 'blank' };
+
+      let line = document.createElement('div');
+      wrap.appendChild(line);
+
+      tokens.forEach(tok => {
+        if (tok.t === 'n') {
+          line = document.createElement('div');
+          wrap.appendChild(line);
+          return;
+        }
+        const span = document.createElement('span');
+        span.textContent = tok.s;
+        if (tok.t === 'b') {
+          span.style.cssText = 'color:#f0c040;background:rgba(240,192,64,.15);padding:0 4px;border-radius:3px;font-style:italic;';
+        } else if (tok.t === 'k') span.className = 'kw';
+        else if (tok.t === 's') span.className = 'str';
+        else if (tok.t === 'n2') span.className = 'num';
+        else if (tok.t === 'c') span.className = 'cm';
+        else if (tok.t === 'f') span.className = 'fn';
+        line.appendChild(span);
+      });
+      return wrap;
+    }
+
+    // ── XP Header ────────────────────────────────────────────────────────────────
+    function mkHeader() {
+      const pct = Math.round(S.xp / MAX_XP * 100);
+      const h = D('hdr');
+      h.innerHTML = `
+    <span class="hdr-title">Code Chronicles</span>
+    <span class="xp-lbl">EP&nbsp;${S.xp}&nbsp;/&nbsp;${MAX_XP}</span>
+    <div class="xp-wrap"><div class="xp-fill" style="width:${pct}%"></div></div>
+  `;
+      return h;
+    }
+
+    // ── Title ─────────────────────────────────────────────────────────────────────
+    function mkTitle() {
+      const w = D('title-screen fade-in');
+      w.innerHTML = `
+    <div class="game-title">Code Chronicles</div>
+    <div class="game-sub">Die Legende des verlorenen Algorithmus</div>
+    <div class="badges">
+      <span class="badge" style="background:rgba(212,160,23,.14);color:#d4a017;border-color:rgba(212,160,23,.35)">📦 Variablen</span>
+      <span class="badge" style="background:rgba(224,107,86,.14);color:#e06b56;border-color:rgba(224,107,86,.35)">🐉 If / Else</span>
+      <span class="badge" style="background:rgba(57,197,166,.14);color:#39c5a6;border-color:rgba(57,197,166,.35)">🌀 Schleifen</span>
+      <span class="badge" style="background:rgba(163,113,247,.14);color:#a371f7;border-color:rgba(163,113,247,.35)">📖 Funktionen</span>
+    </div>
+    <p style="color:var(--muted);font-size:17px;max-width:470px;margin:0 auto 2rem;font-style:italic">
+      Vier Quests · 12 Code-Rätsel · 180 Erfahrungspunkte<br>Lerne Programmierung durch ein magisches Abenteuer.
+    </p>
+  `;
+      w.appendChild(Btn('Abenteuer beginnen ›', () => go('map')));
+      return w;
+    }
+
+    // ── Map ───────────────────────────────────────────────────────────────────────
+    function mkMap() {
+      const w = D('fade-in');
+
+      const sh = D('sec-hdr'); sh.textContent = 'Dein Abenteuer'; w.appendChild(sh);
+
+      const grid = D('ch-grid');
+      CHAPTERS.forEach((ch, i) => {
+        const locked = i > 0 && !S.done.has(i - 1);
+        const done = S.done.has(i);
+        const col = done ? 'var(--ok)' : CH.colors[i];
+        const card = D(`ch-card${locked ? ' locked' : ''}${done ? ' done' : ''}`);
+        card.style.setProperty('--ch', done ? 'var(--ok)' : CH.colors[i]);
+        const statusTxt = done ? '✓ Abgeschlossen' : locked ? '🔒 Gesperrt' : '► Spielen';
+        const statusCol = done ? 'var(--ok)' : locked ? 'var(--muted)' : CH.colors[i];
+        card.innerHTML = `
+      <div class="ch-num">KAPITEL ${i + 1}</div>
+      <div class="ch-name" style="color:${col}">${CH.icons[i]} ${ch.title}</div>
+      <div class="ch-concept">${ch.concept}</div>
+      <div class="ch-status" style="color:${statusCol}">${statusTxt}</div>
+    `;
+        if (!locked) card.onclick = () => go('intro', { chIdx: i });
+        grid.appendChild(card);
+      });
+      w.appendChild(grid);
+
+      if (S.xp > 0) {
+        const pct = Math.round(S.xp / MAX_XP * 100);
+        const pc = D('prog-card');
+        pc.innerHTML = `
+      <div style="display:flex;justify-content:space-between;font-size:14px">
+        <span style="color:var(--muted)">Gesamtfortschritt</span>
+        <span style="color:var(--gold);font-family:'JetBrains Mono',monospace">${S.xp} / ${MAX_XP} EP</span>
+      </div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${pct}%"></div></div>
+    `;
+        w.appendChild(pc);
+      }
+      return w;
+    }
+
+    // ── Intro ─────────────────────────────────────────────────────────────────────
+    function mkIntro() {
+      const ch = CHAPTERS[S.chIdx];
+      const col = CH.colors[S.chIdx];
+      const w = D('fade-in');
+
+      const sh = D('sec-hdr');
+      sh.style.color = col;
+      sh.textContent = `Kapitel ${S.chIdx + 1}: ${ch.concept}`;
+      w.appendChild(sh);
+
+      const card = D('card card-accent');
+      card.style.setProperty('--ch', col);
+
+      const title = document.createElement('h2');
+      title.style.cssText = `font-family:'Cinzel Decorative',serif;font-size:20px;color:${col};margin-bottom:1.1rem;line-height:1.4`;
+      title.textContent = CH.icons[S.chIdx] + '  ' + ch.title;
+      card.appendChild(title);
+
+      const story = D('story');
+      story.textContent = ch.intro;
+      card.appendChild(story);
+
+      const acts = D('actions-left');
+      acts.appendChild(Btn('‹ Zur Karte', () => go('map'), 'btn-ghost'));
+      const startB = Btn('Herausforderung beginnen ›', () => go('question', { qIdx: 0 }));
+      startB.style.cssText = `color:${col};border-color:${col}`;
+      acts.appendChild(startB);
+      card.appendChild(acts);
+
+      w.appendChild(card);
+      return w;
+    }
+
+    // ── Question ──────────────────────────────────────────────────────────────────
+    function mkQuestion() {
+      const ch = CHAPTERS[S.chIdx];
+      const q = ch.questions[S.qIdx];
+      const col = CH.colors[S.chIdx];
+      const w = D('fade-in');
+
+      const sh = D('sec-hdr');
+      sh.style.color = col;
+      sh.textContent = `Kapitel ${S.chIdx + 1}  ·  Frage ${S.qIdx + 1} / 3`;
+      w.appendChild(sh);
+
+      const dots = D('dots');
+      for (let i = 0; i < 3; i++) {
+        const d = D('dot'); d.style.setProperty('--ch', col);
+        if (i < S.qIdx) d.classList.add('done');
+        else if (i === S.qIdx) d.classList.add('active');
+        dots.appendChild(d);
+      }
+      w.appendChild(dots);
+
+      const card = D('card card-accent');
+      card.style.setProperty('--ch', col);
+
+      const snip = D('snippet'); snip.textContent = q.story; card.appendChild(snip);
+      card.appendChild(mkCode(q.code));
+
+      const qt = D('q-text'); qt.textContent = q.question; card.appendChild(qt);
+
+      const opts = D('opts');
+      q.opts.forEach((opt, i) => {
+        const b = document.createElement('button');
+        b.className = 'opt';
+        b.textContent = opt;
+        if (S.answered) {
+          b.disabled = true;
+          if (i === q.right) b.classList.add('correct');
+          else if (i === S.sel) b.classList.add('wrong');
+        } else {
+          b.onclick = () => doAnswer(i);
+        }
+        opts.appendChild(b);
+      });
+      card.appendChild(opts);
+
+      if (S.answered) {
+        const ok = S.sel === q.right;
+        const fb = D(`fb ${ok ? 'ok' : 'bad'}`);
+        const head = D(`fb-head ${ok ? 'ok' : 'bad'}`);
+        head.textContent = ok ? '✦ Richtig!' : '✗ Nicht ganz.';
+        fb.appendChild(head);
+        const body = document.createElement('p');
+        body.style.cssText = 'margin-top:.3rem;white-space:pre-line;font-size:15px;color:var(--muted)';
+        body.textContent = q.fb.replace('✦  ', '');
+        fb.appendChild(body);
+        card.appendChild(fb);
+
+        const isLast = S.qIdx >= 2;
+        const nxtB = Btn(isLast ? 'Kapitel abschließen ›' : 'Nächste Frage ›', () => {
+          if (isLast) { S.done.add(S.chIdx); go('chComplete'); }
+          else go('question', { qIdx: S.qIdx + 1 });
+        }, 'btn-ok btn-sm');
+        nxtB.style.marginTop = '.25rem';
+        card.appendChild(nxtB);
+      }
+
+      w.appendChild(card);
+      return w;
+    }
+
+    function doAnswer(idx) {
+      const q = CHAPTERS[S.chIdx].questions[S.qIdx];
+      S.xp += idx === q.right ? 15 : 0;
+      S.sel = idx; S.answered = true;
+      render();
+    }
+
+    // ── Chapter Complete ──────────────────────────────────────────────────────────
+    function mkChComplete() {
+      const ch = CHAPTERS[S.chIdx];
+      const col = CH.colors[S.chIdx];
+      const icon = CH.icons[S.chIdx];
+      const isLast = S.chIdx === CHAPTERS.length - 1;
+      const w = D('cmplt fade-in');
+
+      const icoEl = document.createElement('div');
+      icoEl.style.cssText = 'font-size:62px;margin-bottom:.75rem';
+      icoEl.textContent = icon;
+      w.appendChild(icoEl);
+
+      const cHead = document.createElement('div');
+      cHead.style.cssText = `font-family:'Cinzel Decorative',serif;font-size:18px;color:${col};margin-bottom:1rem`;
+      cHead.textContent = 'Kapitel abgeschlossen!';
+      w.appendChild(cHead);
+
+      const card = D('card');
+      card.style.textAlign = 'left';
+      const story = D('story');
+      story.textContent = ch.complete;
+      card.appendChild(story);
+      w.appendChild(card);
+
+      const xpE = D('xp-earned'); xpE.textContent = '+45 EP verdient!'; w.appendChild(xpE);
+      const stars = D('star-row'); stars.textContent = '★ ★ ★'; w.appendChild(stars);
+
+      const acts = D('actions');
+      if (isLast) {
+        acts.appendChild(Btn('Zur Siegesfeier 🏆', () => go('victory')));
+      } else {
+        const nb = Btn(`Kapitel ${S.chIdx + 2} beginnen ›`, () => go('intro', { chIdx: S.chIdx + 1 }));
+        nb.style.cssText = `color:${col};border-color:${col}`;
+        acts.appendChild(nb);
+        acts.appendChild(Btn('Zur Karte', () => go('map'), 'btn-ghost'));
+      }
+      w.appendChild(acts);
+      return w;
+    }
+
+    // ── Victory ───────────────────────────────────────────────────────────────────
+    function mkVictory() {
+      const w = D('cmplt fade-in');
+      const perfect = S.xp === MAX_XP;
+      const pct = Math.round(S.xp / MAX_XP * 100);
+
+      w.innerHTML = `
+    <div style="font-size:72px;margin-bottom:.75rem">🏆</div>
+    <div class="game-title" style="font-size:26px;margin-bottom:.5rem">Quest vollendet!</div>
+    <div style="font-size:18px;color:var(--muted);font-style:italic;margin-bottom:1.75rem">Du bist nun Meister der Code-Künste</div>
+    <div class="sum-grid">
+      ${CHAPTERS.map((ch, i) => `
+        <div class="sum-item" style="--ch:${CH.colors[i]}">
+          <div class="sum-num">KAPITEL ${i + 1}</div>
+          <div class="sum-name" style="color:${CH.colors[i]}">${CH.icons[i]} ${ch.concept}</div>
+          <div class="sum-status">✓ Abgeschlossen</div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="xp-earned">${S.xp} / ${MAX_XP} EP</div>
+    <div style="font-size:15px;color:var(--muted);margin:.5rem 0 1rem">
+      ${perfect ? '🌟 Perfektes Ergebnis – alle Antworten korrekt!' : `${pct}% richtig beantwortet`}
+    </div>
+    <div class="star-row">★ ★ ★ ★</div>
+    <div class="card" style="text-align:left">
+      <div style="font-family:'Cinzel Decorative',serif;font-size:13px;color:var(--gold2);margin-bottom:.75rem">Du hast gelernt:</div>
+      <div style="display:flex;flex-direction:column;gap:.4rem;font-size:16px">
+        <div style="color:var(--c1)">📦 Variablen & Datentypen – Werte sicher aufbewahren</div>
+        <div style="color:var(--c2)">🐉 If / Else – Bedingte Entscheidungen treffen</div>
+        <div style="color:var(--c3)">🌀 Schleifen – For & While für Wiederholungen</div>
+        <div style="color:var(--c4)">📖 Funktionen – Wiederverwendbaren Code schreiben</div>
+      </div>
+    </div>
+  `;
+
+      const rb = Btn('Nochmals spielen', () => {
+        S.xp = 0; S.done = new Set(); go('title');
+      }, 'btn-ghost');
+      rb.style.marginTop = '1.25rem';
+      w.appendChild(rb);
+      return w;
+    }
+
+    // ── Render ────────────────────────────────────────────────────────────────────
+    function render() {
+      const app = document.getElementById('app');
+      app.innerHTML = '';
+      if (S.screen !== 'title') app.appendChild(mkHeader());
+      const fn = { title: mkTitle, map: mkMap, intro: mkIntro, question: mkQuestion, chComplete: mkChComplete, victory: mkVictory };
+      if (fn[S.screen]) app.appendChild(fn[S.screen]());
+    }
+
+    render();
+  </script>
+</body>
+
+</html>
